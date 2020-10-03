@@ -10,7 +10,10 @@
 #include <opencv2/imgproc.hpp>
 // #include <Eigen/Dense>
 #include <algorithm>
+#include <pcl/visualization/cloud_viewer.h> //visualization of PC
 #include "cloud.h"
+#include "voxel.h"
+
 
 typedef pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudPtr;
 #define mat_data CV_32F
@@ -145,6 +148,7 @@ int main(int argc, char* argv[]) {
     std::sort(depthImageNames.begin(), depthImageNames.end());
     
     std::vector< cloudPtr > allCloud;
+    std::vector< cloudPtr > allCloudVoxel;
     for(auto i=0; i < 2; ++i){
         cv::Mat img             = cv::imread(rgbImageNames[i], -1);
         cv::Mat imgDepth        = cv::imread(depthImageNames[i], -1);
@@ -153,15 +157,20 @@ int main(int argc, char* argv[]) {
             std::cout << "Could not read the image: " << rgbImageNames[0] << std::endl;
             return 1;
         }
-        
-        allCloud.push_back(calculate(imgDepth, img));
+        cloudPtr currCloud = calculate(imgDepth, img);
+        cloudPtr currVoxelCloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+        allCloud.push_back(currCloud);
+
+        downSampleVoxel(currCloud, currVoxelCloud);
+        allCloudVoxel.push_back(currVoxelCloud);
+
         // cv::imshow("Display window", img);
         pcl::visualization::CloudViewer viewer("Simple Cloud Viewer");
-        viewer.showCloud(allCloud.back());
+        viewer.showCloud(allCloudVoxel.back());
         while (!viewer.wasStopped())
         {
         }
     }    
-    int k = cv::waitKey(0); // Wait for a keystroke in the window
+    // int k = cv::waitKey(0); // Wait for a keystroke in the window
     return 0;
 }

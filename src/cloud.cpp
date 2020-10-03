@@ -16,11 +16,7 @@ cloudPtr createCloudFromImage(cv::Mat &RGBimage, cv::Mat &worldCord) {
 		pt.z = worldCord.at<float>(2,i);
 		cloud->push_back(pt);
 	}
-	//pcl::visualization::CloudViewer viewer("Simple Cloud Viewer");
-	//viewer.showCloud(cloud);
-	// while (!viewer.wasStopped())
-	// {
-	// }
+	
 	return cloud;	
 
 }

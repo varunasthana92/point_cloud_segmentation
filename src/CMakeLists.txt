@@ -1,11 +1,11 @@
-add_executable(segment main.cpp cloud.cpp)
+add_executable(segment main.cpp cloud.cpp voxel.cpp)
 add_executable(trypcl trypcl.cpp)
 
-include_directories(
-    ${CMAKE_SOURCE_DIR}/include
-)
 
-include_directories(${PCL_INCLUDE_DIRS})
+include_directories(${PCL_INCLUDE_DIRS}
+					${CMAKE_SOURCE_DIR}/include
+					)
+
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
