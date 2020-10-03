@@ -1,5 +1,4 @@
 #include <iostream>
-// #include <pcl/io/ply_io.h>
 #include <string>
 #include <math.h>
 #include <glob.h>
@@ -89,8 +88,16 @@ cv::Mat meshCV(int rows, int cols){
     return grid;
 }
 
-
-cv::Mat calculate(cv::Mat &imgDepth, cv::Mat img){
+cv::Mat getImage(std::string name) {
+    return cv::imread(name, -1);
+}
+ 
+cloudPtr calculate(std::string &imgName, std::string &depthImageName){
+    cv::Mat img = getImage(imgName);
+    cv::Mat imgDepth = getImage(depthImageName);
+    if(img.empty()){
+        std::cout << "Could not read the image: " << imgName << std::endl;
+    }
     imgDepth.convertTo(imgDepth, mat_data);
     cv::Mat allDepth = imgDepth.reshape(0, 1); // 0 channels and 1 row
     allDepth.push_back(allDepth.row(0));
@@ -122,8 +129,8 @@ cv::Mat calculate(cv::Mat &imgDepth, cv::Mat img){
 
     cv::Mat dst;
     cv::remap( img, dst, map_x, map_y, CV_INTER_LINEAR);
-    createCloudFromImage(dst, worldCord);
-    return dst;
+    auto cloud = createCloudFromImage(dst, worldCord);
+    return cloud;
 }
 
 
@@ -142,23 +149,36 @@ int main(int argc, char* argv[]) {
     // sort the data in an increasin lexicographical order
     std::sort(rgbImageNames.begin(), rgbImageNames.end());
     std::sort(depthImageNames.begin(), depthImageNames.end());
-    
-    cv::Mat img                 = cv::imread(rgbImageNames[0], -1);
-    cv::Mat imgDepth            = cv::imread(depthImageNames[0], -1);
-    
-    if(img.empty()){
-        std::cout << "Could not read the image: " << rgbImageNames[0] << std::endl;
-        return 1;
-    }
 
-    cv::Mat result              = calculate(imgDepth, img);
-    cv::imshow("Display window", img);
-    cv::imshow("Remapped window", result);
+    pcl::visualization::CloudViewer viewer("Simple Cloud Viewer");
+    pcl::IterativeClosestPoint<pcl::PointXYZRGB,pcl::PointXYZRGB> icp;
+    // pcl::IterativeClosestPoint<pcl::PointCloud<pcl::PointXYZRGB>, pcl::PointCloud<pcl::PointXYZRGB>> icpp;
+    // for(int i=0; i<=15; i++) {
+    //     cloudPtr cloud = calculate(rgbImageNames[i], depthImageNames[i]);
+    // 	viewer.showCloud(cloud);
+    // }
+    cloudPtr cloud1 = calculate(rgbImageNames[0], depthImageNames[0]);
+    cloudPtr cloud2 = calculate(rgbImageNames[1], depthImageNames[1]);
+    pcl::PointCloud<pcl::PointXYZRGB> transformed;
+    icp.setInputCloud(cloud2);
+    icp.setInputTarget(cloud1);
+    icp.setMaximumIterations( 20 );
+    icp.setMaxCorrespondenceDistance( 0.1 );
     
-    int k = cv::waitKey(0); // Wait for a keystroke in the window
-    if(k == 's')
-    {
-        cv::imwrite("starry_night.png", img);
-    }
+    icp.align(transformed);
+
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr transformed_cloud (new pcl::PointCloud<pcl::PointXYZRGB> ());
+    pcl::transformPointCloud (*cloud2, *transformed_cloud, icp.getFinalTransformation());
+   
+    // (∗cloud2 ) +=∗(cloud1 ) ;
+    viewer.showCloud(transformed_cloud);
+    viewer.showCloud(cloud1);
+    while (!viewer.wasStopped())
+	{
+	}
     return 0;
 }
+
+
+
+

@@ -3,8 +3,11 @@
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 #include <pcl/visualization/cloud_viewer.h>
+#include <pcl/registration/icp.h>
 #include <string>
 #include <math.h>
 #include <vector>
 
-void createCloudFromImage(cv::Mat &RGBimage, cv::Mat &worldCord);
+typedef pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudPtr;
+
+cloudPtr createCloudFromImage(cv::Mat &RGBimage, cv::Mat &worldCord);
