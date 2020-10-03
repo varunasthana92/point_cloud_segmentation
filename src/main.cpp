@@ -10,6 +10,7 @@
 #include <opencv2/imgproc.hpp>
 // #include <Eigen/Dense>
 #include <algorithm>
+#include "cloud.h"
 
 #define mat_data CV_32F
 float kk_ir[3][3]       = { {572.12194657,  0.0,            319.92431451}, 
