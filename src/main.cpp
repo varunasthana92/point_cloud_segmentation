@@ -12,6 +12,7 @@
 #include <algorithm>
 #include "cloud.h"
 
+typedef pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudPtr;
 #define mat_data CV_32F
 float kk_ir[3][3]       = { {572.12194657,  0.0,            319.92431451}, 
                             {0.0,           572.23379558,   250.6101592}, 
@@ -90,7 +91,7 @@ cv::Mat meshCV(int rows, int cols){
 }
 
 
-cv::Mat calculate(cv::Mat &imgDepth, cv::Mat img){
+cloudPtr calculate(cv::Mat &imgDepth, cv::Mat img){
     imgDepth.convertTo(imgDepth, mat_data);
     cv::Mat allDepth = imgDepth.reshape(0, 1); // 0 channels and 1 row
     allDepth.push_back(allDepth.row(0));
@@ -122,8 +123,8 @@ cv::Mat calculate(cv::Mat &imgDepth, cv::Mat img){
 
     cv::Mat dst;
     cv::remap( img, dst, map_x, map_y, CV_INTER_LINEAR);
-    createCloudFromImage(dst, worldCord);
-    return dst;
+    
+    return createCloudFromImage(dst, worldCord);
 }
 
 
@@ -143,22 +144,24 @@ int main(int argc, char* argv[]) {
     std::sort(rgbImageNames.begin(), rgbImageNames.end());
     std::sort(depthImageNames.begin(), depthImageNames.end());
     
-    cv::Mat img                 = cv::imread(rgbImageNames[0], -1);
-    cv::Mat imgDepth            = cv::imread(depthImageNames[0], -1);
-    
-    if(img.empty()){
-        std::cout << "Could not read the image: " << rgbImageNames[0] << std::endl;
-        return 1;
-    }
-
-    cv::Mat result              = calculate(imgDepth, img);
-    cv::imshow("Display window", img);
-    cv::imshow("Remapped window", result);
-    
+    std::vector< cloudPtr > allCloud;
+    for(auto i=0; i < 2; ++i){
+        cv::Mat img             = cv::imread(rgbImageNames[i], -1);
+        cv::Mat imgDepth        = cv::imread(depthImageNames[i], -1);
+        
+        if(img.empty()){
+            std::cout << "Could not read the image: " << rgbImageNames[0] << std::endl;
+            return 1;
+        }
+        
+        allCloud.push_back(calculate(imgDepth, img));
+        // cv::imshow("Display window", img);
+        pcl::visualization::CloudViewer viewer("Simple Cloud Viewer");
+        viewer.showCloud(allCloud.back());
+        while (!viewer.wasStopped())
+        {
+        }
+    }    
     int k = cv::waitKey(0); // Wait for a keystroke in the window
-    if(k == 's')
-    {
-        cv::imwrite("starry_night.png", img);
-    }
     return 0;
 }

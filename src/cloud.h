@@ -7,4 +7,4 @@
 #include <math.h>
 #include <vector>
 
-void createCloudFromImage(cv::Mat &RGBimage, cv::Mat &worldCord);
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr createCloudFromImage(cv::Mat &RGBimage, cv::Mat &worldCord);

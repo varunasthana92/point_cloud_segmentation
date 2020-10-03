@@ -1,8 +1,9 @@
 #include "cloud.h"
 
+typedef pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudPtr;
 
-void createCloudFromImage(cv::Mat &RGBimage, cv::Mat &worldCord) {
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+cloudPtr createCloudFromImage(cv::Mat &RGBimage, cv::Mat &worldCord) {
+	cloudPtr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
 	pcl::PointXYZRGB pt;
 	int w = RGBimage.size().width;
 	size_t length = worldCord.size().width;
@@ -15,10 +16,11 @@ void createCloudFromImage(cv::Mat &RGBimage, cv::Mat &worldCord) {
 		pt.z = worldCord.at<float>(2,i);
 		cloud->push_back(pt);
 	}
-	pcl::visualization::CloudViewer viewer("Simple Cloud Viewer");
-	viewer.showCloud(cloud);
-	while (!viewer.wasStopped())
-	{
-	}	
+	//pcl::visualization::CloudViewer viewer("Simple Cloud Viewer");
+	//viewer.showCloud(cloud);
+	// while (!viewer.wasStopped())
+	// {
+	// }
+	return cloud;	
 
 }
