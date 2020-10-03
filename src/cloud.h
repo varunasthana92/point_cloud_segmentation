@@ -7,5 +7,4 @@
 #include <math.h>
 #include <vector>
 
-
-void createCloudFromImage(cv::Mat &image, cv::Mat &indices, cv::Mat &depth);
+void createCloudFromImage(cv::Mat &RGBimage, cv::Mat &worldCord);

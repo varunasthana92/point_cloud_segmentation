@@ -122,7 +122,7 @@ cv::Mat calculate(cv::Mat &imgDepth, cv::Mat img){
 
     cv::Mat dst;
     cv::remap( img, dst, map_x, map_y, CV_INTER_LINEAR);
-    createCloudFromImage(dst, worldCord, imgDepth);
+    createCloudFromImage(dst, worldCord);
     return dst;
 }
 

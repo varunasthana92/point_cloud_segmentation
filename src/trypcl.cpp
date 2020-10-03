@@ -23,17 +23,17 @@ int main(int argc, char* argv[]) {
 		pt.x = 1.0;
 		pt.y = 1.0;
 		pt.z = float(i);
-		pt.rgb = i;
+		//pt.rgb = i;
 		cloud->push_back(pt);
 	}	
 	std::cout << "Loaded "
 				<< cloud->width * cloud->height
 				<< " data points from test_pcd.pcd with the following fields: "
 				<< std::endl;
-	for (size_t i = 0; i < cloud->points.size(); ++i)
-		std::cout << "    " << cloud->points[i].x
-				<< " " << cloud->points[i].y
-				<< " " << cloud->points[i].z << std::endl;
+	// for (size_t i = 0; i < cloud->points.size(); ++i)
+	// 	std::cout << "    " << cloud->points[i].x
+	// 			<< " " << cloud->points[i].y
+	// 			<< " " << cloud->points[i].z << std::endl;
 
 	pcl::visualization::CloudViewer viewer("Simple Cloud Viewer");
 	viewer.showCloud(cloud);
